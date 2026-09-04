@@ -1,0 +1,1086 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AucTech Vault</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FDFBFC; --bg2:#FFFFFF;
+  --card:#FFFFFF; --tint:#FDF2F6; --tint2:#FBE7EF;
+  --line:#F2DEE7; --line2:#E9C6D5;
+  --text:#33202B; --muted:#8C6E7C; --faint:#B79AA7;
+  --cherry:#DE3163; --cherry-d:#C02050;
+  --brand:linear-gradient(135deg,#FF5C8A 0%,#DE3163 60%,#C02050 100%);
+  --ok:#1E9E6A; --ok-bg:#E5F6EE;
+  --warn:#B77A00; --warn-bg:#FDF3DC;
+  --danger:#D6455A; --danger-bg:#FCE9EC;
+  --r:16px; --r-sm:10px;
+  --shadow:0 6px 24px rgba(222,49,99,.09);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'Manrope',system-ui,-apple-system,Segoe UI,sans-serif;
+  background:
+    radial-gradient(800px 420px at 100% -10%, rgba(255,92,138,.08), transparent 60%),
+    radial-gradient(650px 380px at -10% 105%, rgba(222,49,99,.05), transparent 55%),
+    var(--bg);
+  color:var(--text); line-height:1.55; min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:'Sora','Manrope',sans-serif;letter-spacing:-.01em}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+input,select,textarea{
+  font:inherit;color:var(--text);width:100%;
+  background:#fff;border:1.5px solid var(--line);
+  border-radius:var(--r-sm);padding:10px 12px;outline:none;
+  transition:border-color .18s, box-shadow .18s;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--cherry);box-shadow:0 0 0 3px rgba(222,49,99,.12)}
+label{display:block;font-size:.76rem;font-weight:700;color:var(--muted);margin:0 0 5px;text-transform:uppercase;letter-spacing:.06em}
+.field{margin-bottom:14px}
+:focus-visible{outline:2px solid var(--cherry);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:99px;
+  font-weight:700;font-size:.88rem;border:1.5px solid var(--line2);background:#fff;
+  transition:transform .16s, background .16s, border-color .16s}
+.btn:hover{background:var(--tint);border-color:var(--cherry)}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--brand);border:none;color:#fff;box-shadow:0 4px 16px rgba(222,49,99,.3)}
+.btn-primary:hover{filter:brightness(1.06);background:var(--brand)}
+.btn-ghost{border-color:transparent;background:transparent;color:var(--muted)}
+.btn-ghost:hover{color:var(--cherry);background:var(--tint)}
+.btn-danger{border-color:rgba(214,69,90,.4);color:var(--danger)}
+.btn-danger:hover{background:var(--danger-bg);border-color:var(--danger)}
+.icon-btn{padding:7px;border-radius:9px;color:var(--faint);display:inline-flex;transition:color .15s,background .15s}
+.icon-btn:hover{color:var(--cherry);background:var(--tint)}
+.icon-btn svg{width:17px;height:17px}
+
+/* ---------- lock screen ---------- */
+#lockScreen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;z-index:200;background:inherit}
+.lock-card{width:min(420px,100%);padding:42px 34px;text-align:center}
+.lock-mark{width:72px;height:72px;margin:0 auto 16px;display:block}
+.lock-card h1{font-size:1.35rem;margin-bottom:4px}
+.lock-card .sub{color:var(--muted);font-size:.9rem;margin-bottom:24px}
+.lock-card input{text-align:center;font-size:1.05rem;letter-spacing:.02em}
+.lock-card .btn-primary{width:100%;justify-content:center;padding:12px;margin-top:6px}
+.lock-err{color:var(--danger);font-size:.85rem;min-height:1.3em;margin-top:10px}
+.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-9px)}40%,80%{transform:translateX(9px)}}
+.lock-foot{margin-top:24px;font-size:.74rem;color:var(--faint)}
+
+/* ---------- shell ---------- */
+#app{display:none;min-height:100vh}
+#app.on{display:block}
+.header{position:sticky;top:0;z-index:80;background:rgba(255,255,255,.85);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);padding:12px 22px;display:flex;align-items:center;gap:14px}
+.brand{display:flex;align-items:center;gap:10px;flex:none}
+.brand svg{width:32px;height:32px}
+.brand .bn{font-family:'Sora';font-weight:700;font-size:.92rem;line-height:1.1}
+.brand .bn small{display:block;font-size:.6rem;font-weight:700;color:var(--cherry);letter-spacing:.24em;text-transform:uppercase}
+.searchwrap{flex:1;position:relative;max-width:520px;margin:0 auto}
+.searchwrap svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--faint)}
+.searchwrap input{padding-left:38px;border-radius:99px;background:var(--tint)}
+.kbd{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:.66rem;color:var(--faint);
+  border:1px solid var(--line2);border-radius:5px;padding:1px 6px;background:#fff}
+.hdr-acts{display:flex;gap:8px;flex:none;align-items:center}
+.who{font-size:.76rem;color:var(--muted);font-weight:700;padding:0 4px}
+.tabs{display:flex;gap:4px;padding:10px 22px 0;max-width:1080px;margin:0 auto;overflow-x:auto}
+.tab{padding:9px 18px;border-radius:99px;font-weight:700;font-size:.88rem;color:var(--muted);white-space:nowrap;
+  transition:background .15s,color .15s}
+.tab:hover{color:var(--cherry);background:var(--tint)}
+.tab.on{color:#fff;background:var(--brand);box-shadow:0 3px 12px rgba(222,49,99,.28)}
+.main{padding:20px 22px 80px;max-width:1080px;margin:0 auto;min-width:0}
+
+/* ---------- dashboard ---------- */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:22px}
+.stat{padding:18px 20px}
+.stat .n{font-family:'Sora';font-size:1.9rem;font-weight:700;line-height:1.1;color:var(--cherry)}
+.stat .l{font-size:.78rem;color:var(--muted);font-weight:700;margin-top:3px}
+.stat.warn .n{color:var(--warn)} .stat.danger .n{color:var(--danger)} .stat.ok .n{color:var(--ok)}
+.section-t{font-size:.95rem;margin:24px 0 12px}
+.timeline{display:flex;gap:10px;overflow-x:auto;padding:16px}
+.tl-item{flex:none;width:152px;padding:12px 13px;border-radius:12px;border:1px solid var(--line);background:#fff}
+.tl-item .d{font-size:.72rem;font-weight:800;letter-spacing:.04em}
+.tl-item .dom{font-weight:700;font-size:.85rem;margin:4px 0 2px;word-break:break-all}
+.tl-item .amt{font-size:.75rem;color:var(--muted)}
+.tl-green{border-top:3px solid var(--ok)} .tl-green .d{color:var(--ok)}
+.tl-amber{border-top:3px solid var(--warn)} .tl-amber .d{color:var(--warn)}
+.tl-red{border-top:3px solid var(--danger)} .tl-red .d{color:var(--danger)}
+.empty{padding:46px 24px;text-align:center;color:var(--muted)}
+.empty .big{font-size:2rem;margin-bottom:8px}
+.empty p{max-width:420px;margin:0 auto 16px;font-size:.92rem}
+
+/* ---------- vault ---------- */
+.chiprow{display:flex;gap:7px;overflow-x:auto;padding-bottom:10px;margin-bottom:6px}
+.chip{flex:none;padding:6px 14px;border-radius:99px;font-size:.82rem;color:var(--muted);font-weight:700;
+  border:1.5px solid var(--line);background:#fff;transition:all .15s}
+.chip:hover{border-color:var(--cherry);color:var(--cherry)}
+.chip.on{background:var(--tint2);border-color:var(--cherry);color:var(--cherry-d)}
+.cred-list{display:flex;flex-direction:column;gap:10px;min-width:0}
+.cred{display:flex;align-items:center;gap:14px;padding:13px 16px;transition:border-color .18s,box-shadow .18s}
+.cred:hover{border-color:var(--line2);box-shadow:0 8px 26px rgba(222,49,99,.13)}
+.cred .cat-ic{width:38px;height:38px;flex:none;border-radius:11px;display:flex;align-items:center;justify-content:center;
+  background:var(--tint2);color:var(--cherry)}
+.cred .cat-ic svg{width:18px;height:18px}
+.cred .info{flex:1;min-width:0}
+.cred .t{font-weight:700;font-size:.92rem;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.cred .t .prov{color:var(--muted);font-weight:600;font-size:.8rem}
+.cred .s{font-size:.78rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cred .acts{display:flex;gap:2px;flex:none}
+.tag{display:inline-block;font-size:.66rem;font-weight:700;padding:1px 8px;border-radius:99px;
+  background:var(--tint);color:var(--muted)}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:.7rem;font-weight:800;padding:2px 9px;border-radius:99px}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.b-ok{color:var(--ok);background:var(--ok-bg)}
+.b-warn{color:var(--warn);background:var(--warn-bg)}
+.b-danger{color:var(--danger);background:var(--danger-bg)}
+.b-mut{color:var(--muted);background:var(--tint)}
+.secret-row{font-family:ui-monospace,Menlo,monospace;font-size:.82rem;color:var(--cherry-d)}
+.count-line{font-size:.82rem;color:var(--faint);margin-bottom:10px}
+
+/* ---------- quick views & social ---------- */
+.quickrow{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.quickrow .btn{padding:10px 18px}
+.soc-card{padding:16px 18px;margin-bottom:14px}
+.soc-head{display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap}
+.soc-head h3{font-size:1rem;flex:1;min-width:120px}
+.handle{display:flex;align-items:center;gap:12px;padding:10px 4px;border-top:1px solid var(--line)}
+.handle .plat{font-weight:800;font-size:.85rem;width:150px;flex:none;color:var(--cherry-d)}
+.handle .u{flex:1;min-width:0;font-size:.82rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.handle .hacts{display:flex;gap:2px;flex:none}
+@media (max-width:720px){
+  .handle{flex-wrap:wrap}
+  .handle .plat{width:100%}
+  .handle .hacts{margin-left:auto}
+}
+
+/* ---------- tables ---------- */
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th{font-size:.7rem;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);text-align:left;
+  padding:10px 12px;border-bottom:1.5px solid var(--line)}
+td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:hover td{background:var(--tint)}
+
+/* ---------- drawer ---------- */
+.overlay{position:fixed;inset:0;background:rgba(51,32,43,.35);backdrop-filter:blur(2px);z-index:100;
+  opacity:0;pointer-events:none;transition:opacity .2s}
+.overlay.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);z-index:110;background:#fff;
+  border-left:1px solid var(--line);padding:26px 26px 40px;overflow-y:auto;
+  transform:translateX(102%);transition:transform .24s cubic-bezier(.3,.8,.3,1);box-shadow:-12px 0 40px rgba(222,49,99,.12)}
+.drawer.on{transform:none}
+.drawer h3{margin-bottom:20px;font-size:1.1rem}
+.drawer .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.drawer .foot{display:flex;gap:10px;margin-top:22px}
+.drawer .foot .btn{flex:1;justify-content:center}
+.pw-wrap{position:relative}
+.pw-wrap input{padding-right:40px}
+.pw-wrap .icon-btn{position:absolute;right:5px;top:50%;transform:translateY(-50%)}
+.link-btn{background:none;border:none;padding:0;font:inherit;font-size:.8rem;font-weight:600;color:var(--cherry);cursor:pointer}
+.link-btn:hover{text-decoration:underline}
+
+/* ---------- toast ---------- */
+#toasts{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:300;display:flex;flex-direction:column;gap:8px;align-items:center}
+.toast{padding:10px 18px;border-radius:99px;font-size:.85rem;font-weight:700;background:#fff;color:var(--text);
+  border:1.5px solid var(--line2);box-shadow:0 10px 30px rgba(51,32,43,.18);animation:pop .22s}
+.toast.ok{border-color:var(--ok);color:var(--ok)}
+.toast.err{border-color:var(--danger);color:var(--danger)}
+@keyframes pop{from{transform:translateY(12px);opacity:0}}
+
+/* ---------- audit / settings ---------- */
+.audit-row{display:flex;gap:12px;padding:9px 14px;font-size:.84rem;border-bottom:1px solid var(--line)}
+.audit-row .when{color:var(--faint);flex:none;width:150px;font-variant-numeric:tabular-nums}
+.audit-row .act{font-weight:800;flex:none;width:74px}
+.a-viewed{color:var(--warn)} .a-copied{color:var(--cherry)} .a-edited{color:var(--ok)}
+.a-deleted{color:var(--danger)} .a-added{color:var(--ok)} .a-unlock{color:var(--muted)}
+.set-block{padding:20px 22px;margin-bottom:16px}
+.set-block h3{font-size:1rem;margin-bottom:6px}
+.set-block .d{font-size:.85rem;color:var(--muted);margin-bottom:14px}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  .header{padding:10px 14px;flex-wrap:wrap}
+  .brand .bn small{display:none}
+  .searchwrap{order:3;max-width:none;width:100%}
+  .main{padding:16px 14px 90px}
+  .drawer{width:100%}
+  .cred{flex-wrap:wrap}
+  .cred .acts{width:100%;justify-content:flex-end;border-top:1px solid var(--line);padding-top:8px;margin-top:4px}
+  .audit-row .when{width:auto}
+  .kbd{display:none}
+}
+</style>
+</head>
+<script>window.AUCTECH_API_BASE = "https://auctech-vault-backend-1.onrender.com/api";</script>
+<script src="login.js"></script>
+<body>
+
+<!-- ============ LOCK SCREEN (rendered/driven by login.js) ============ -->
+<div id="lockScreen">
+  <div class="card lock-card" style="max-width:460px">
+    <h1>AucTech Vault</h1>
+    <div class="sub">Choose how you're signing in</div>
+
+    <div class="login-tabs" style="display:flex;gap:6px;justify-content:center;margin-bottom:20px;flex-wrap:wrap">
+      <button class="btn login-tab on" data-tile="main" onclick="showLoginTile('main')">Main</button>
+      <button class="btn login-tab" data-tile="social" onclick="showLoginTile('social')">Social Media</button>
+      <button class="btn login-tab" data-tile="developer" onclick="showLoginTile('developer')">Developer</button>
+      <button class="btn login-tab" data-tile="secondary" onclick="showLoginTile('secondary')">Secondary</button>
+    </div>
+
+    <!-- MAIN -->
+    <div class="login-tile" id="tile-main">
+      <div class="field"><label>Email</label><input id="main-email" type="email" autocomplete="username"></div>
+      <div class="field">
+        <label>Password</label>
+        <div class="pw-wrap">
+          <input id="main-password" type="password" autocomplete="current-password">
+          <button type="button" class="icon-btn pw-toggle" title="Show password" data-target="main-password"></button>
+        </div>
+      </div>
+      <div style="text-align:right;margin:-6px 0 14px">
+        <button type="button" class="link-btn" onclick="openForgotPassword('main')">Forgot password?</button>
+      </div>
+      <button class="btn btn-primary" onclick="passwordLogin('main')" style="width:100%;justify-content:center">Sign in — Full access</button>
+    </div>
+
+    <!-- SOCIAL MEDIA -->
+    <div class="login-tile" id="tile-social" style="display:none">
+      <div class="field"><label>Email</label><input id="social-email" type="email" autocomplete="username"></div>
+      <div class="field">
+        <label>Password</label>
+        <div class="pw-wrap">
+          <input id="social-password" type="password" autocomplete="current-password">
+          <button type="button" class="icon-btn pw-toggle" title="Show password" data-target="social-password"></button>
+        </div>
+      </div>
+      <div style="text-align:right;margin:-6px 0 14px">
+        <button type="button" class="link-btn" onclick="openForgotPassword('social')">Forgot password?</button>
+      </div>
+      <button class="btn btn-primary" onclick="passwordLogin('social')" style="width:100%;justify-content:center">Sign in — Social media access</button>
+    </div>
+
+    <!-- DEVELOPER -->
+    <div class="login-tile" id="tile-developer" style="display:none">
+      <div class="field"><label>Email</label><input id="developer-email" type="email" autocomplete="username"></div>
+      <div class="field">
+        <label>Password</label>
+        <div class="pw-wrap">
+          <input id="developer-password" type="password" autocomplete="current-password">
+          <button type="button" class="icon-btn pw-toggle" title="Show password" data-target="developer-password"></button>
+        </div>
+      </div>
+      <div style="text-align:right;margin:-6px 0 14px">
+        <button type="button" class="link-btn" onclick="openForgotPassword('developer')">Forgot password?</button>
+      </div>
+      <button class="btn btn-primary" onclick="passwordLogin('developer')" style="width:100%;justify-content:center">Sign in — Developer access</button>
+    </div>
+
+    <!-- FORGOT PASSWORD -->
+    <div class="login-tile" id="tile-forgot" style="display:none">
+      <div class="sub" id="forgot-heading" style="margin-bottom:14px">Reset your password</div>
+
+      <div id="forgot-step-1">
+        <div class="field"><label>Email</label><input id="forgot-email" type="email" autocomplete="username"></div>
+        <button class="btn btn-primary" onclick="requestPasswordReset()" style="width:100%;justify-content:center">Send reset code</button>
+        <button class="btn btn-ghost" onclick="closeForgotPassword()" style="width:100%;justify-content:center;margin-top:8px">Back to sign in</button>
+      </div>
+
+      <div id="forgot-step-2" style="display:none">
+        <div class="field"><label>Reset code</label><input id="forgot-otp" inputmode="numeric" maxlength="6"></div>
+        <div class="field">
+          <label>New password</label>
+          <div class="pw-wrap">
+            <input id="forgot-new-password" type="password" autocomplete="new-password">
+            <button type="button" class="icon-btn pw-toggle" title="Show password" data-target="forgot-new-password"></button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Confirm new password</label>
+          <div class="pw-wrap">
+            <input id="forgot-confirm-password" type="password" autocomplete="new-password">
+            <button type="button" class="icon-btn pw-toggle" title="Show password" data-target="forgot-confirm-password"></button>
+          </div>
+        </div>
+        <div class="sub" style="margin-bottom:14px">Code sent to your email — check your inbox (and spam folder). It expires in a few minutes.</div>
+        <button class="btn btn-primary" onclick="submitPasswordReset()" style="width:100%;justify-content:center">Reset password</button>
+        <button class="btn btn-ghost" onclick="resendPasswordReset()" style="width:100%;justify-content:center;margin-top:8px">Resend code</button>
+        <button class="btn btn-ghost" onclick="closeForgotPassword()" style="width:100%;justify-content:center;margin-top:8px">Back to sign in</button>
+      </div>
+    </div>
+
+    <!-- SECONDARY (guest wizard: name + email -> location -> OTP emailed -> verify) -->
+    <div class="login-tile" id="tile-secondary" style="display:none">
+      <div id="sec-step-1">
+        <div class="field"><label>Full name</label><input id="sec-name" type="text"></div>
+        <div class="field"><label>Email</label><input id="sec-email" type="email"></div>
+        <div class="sub" style="margin-bottom:14px">
+          Allow location access— it's required to continue.
+        </div>
+        <button class="btn btn-primary" onclick="secondaryStep1()" style="width:100%;justify-content:center">Continue</button>
+      </div>
+
+      <div id="sec-step-2" style="display:none">
+        <div class="field"><label>Enter OTP</label><input id="sec-otp" inputmode="numeric" maxlength="6"></div>
+        <div class="sub" style="margin-bottom:14px">Sent to your email — check your inbox.</div>
+        <button class="btn btn-primary" onclick="secondaryVerifyOtp()" style="width:100%;justify-content:center">Verify &amp; Sign in</button>
+        <button class="btn btn-ghost" onclick="secondaryResendOtp()" style="width:100%;justify-content:center;margin-top:8px">Resend OTP</button>
+      </div>
+    </div>
+
+    <div class="lock-err" id="loginErr"></div>
+    <div class="lock-foot">All secondary-user logins and activity are reported to the vault owner.</div>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app">
+  <header class="header">
+    <div class="brand">
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <defs><linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#FF5C8A"/><stop offset=".6" stop-color="#DE3163"/><stop offset="1" stop-color="#C02050"/>
+        </linearGradient></defs>
+        <g fill="none" stroke="url(#bg2)" stroke-linecap="round">
+          <path d="M32 14a18 18 0 1 1-18 18" stroke-width="5"/>
+          <path d="M32 22a10 10 0 1 1-10 10" stroke-width="5"/>
+          <circle cx="32" cy="32" r="4" fill="url(#bg2)" stroke="none"/>
+        </g>
+      </svg>
+      <div class="bn">AucTech<small>Vault</small></div>
+    </div>
+    <div class="searchwrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="globalSearch" placeholder="Search anything — client, domain, provider, username…" oninput="doSearch(this.value)">
+      <span class="kbd">Ctrl K</span>
+    </div>
+    <div class="hdr-acts">
+      <span class="who" id="whoami"></span>
+      <button class="btn btn-primary" id="addBtn" onclick="openEdit()">＋ Add</button>
+      <button class="icon-btn" title="Log out" onclick="manualLogout()" style="align-self:center">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0"/></svg></button>
+    </div>
+  </header>
+  <nav class="tabs">
+    <button class="tab on" data-view="dashboard" onclick="go('dashboard')">Dashboard</button>
+    <button class="tab" data-view="vault" onclick="go('vault')">Vault</button>
+    <button class="tab" data-view="renewals" id="tab-renewals" onclick="go('renewals')">Renewals</button>
+    <button class="tab" data-view="social" id="tab-social" onclick="go('social')">Social Media</button>
+    <button class="tab" data-view="settings" onclick="go('settings')">Settings</button>
+  </nav>
+  <main class="main" id="main"></main>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+<aside class="drawer" id="drawer"></aside>
+<div id="toasts"></div>
+
+<script>
+/* =========================================================================
+   AucTech Vault — frontend app logic.
+
+   IMPORTANT ARCHITECTURE NOTE
+   ----------------------------------------------------------------------
+   This file used to bundle ~245 real client credentials directly inside
+   a JS array (`SEED`) and "encrypt" them client-side after a local master
+   password. That meant the plaintext credentials shipped to every visitor's
+   browser inside the page source, regardless of the login screen — a
+   critical exposure. That array has been removed entirely.
+
+   This version stores NOTHING sensitive in the browser. All credential
+   data lives on your backend and is only ever fetched after a real
+   login (handled by login.js, which gets a JWT from your API). Every
+   request below goes through `authFetch()` (exposed by login.js), which
+   attaches that token automatically and forces a logout on 401/440.
+
+   You need a backend that implements these endpoints (adjust the paths
+   in the fetch calls below if yours differ):
+     GET    /api/credentials          -> { credentials: [...] }
+     POST   /api/credentials          -> create one, returns the created record
+     PUT    /api/credentials/:id      -> update one
+     DELETE /api/credentials/:id      -> delete one
+     GET    /api/audit                -> { entries: [...] }   (optional)
+     POST   /api/audit                -> log one action        (optional)
+
+   If those endpoints don't exist yet, the app still loads — it just shows
+   an empty vault and a toast telling you the backend isn't reachable, so
+   you always have something to test the UI against.
+   ========================================================================= */
+
+const CATEGORIES = ['Domain Registrar','Hosting / cPanel','VPS / SSH','FTP','Cloudflare / DNS','Webmail','Social / Business Account','Payment Gateway / DLT','JKS / Keystore','Support Contact','Note'];
+const CAT_ICONS = {
+  'Domain Registrar':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18-3-3.5-3-14.5 0-18Z"/></svg>',
+  'Hosting / cPanel':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/></svg>',
+  'VPS / SSH':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 9l3 3-3 3M13 15h4"/></svg>',
+  'FTP':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8Z"/><path d="M12 12v4M10 14l2-2 2 2"/></svg>',
+  'Cloudflare / DNS':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 18a4.5 4.5 0 0 0 .4-9A6.5 6.5 0 0 0 5.3 10.7 4 4 0 0 0 6 18h11.5Z"/></svg>',
+  'Webmail':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
+  'Social / Business Account':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M3 20a6 6 0 0 1 12 0M16 4a3.5 3.5 0 0 1 0 7M17 14a6 6 0 0 1 4 6"/></svg>',
+  'Payment Gateway / DLT':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/></svg>',
+  'JKS / Keystore':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="15" r="4.5"/><path d="M11.5 11.5 20 3M16 7l3 3M13 10l2 2"/></svg>',
+  'Support Contact':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 17v2a2 2 0 0 1-2.2 2A19 19 0 0 1 3 4.2 2 2 0 0 1 5 2h2a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.5 2.1L8 9.5a16 16 0 0 0 6.5 6.5l1.1-1.1a2 2 0 0 1 2.1-.5c.8.3 1.7.5 2.6.6A2 2 0 0 1 22 17Z"/></svg>',
+  'Note':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M14 3v6h6M9 13h6M9 17h6"/></svg>'
+};
+const EYE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
+const EYEOFF='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l18 18M10.6 5.1A10.8 10.8 0 0 1 12 5c6.5 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.1M6.6 6.6C4 8.5 2 12 2 12s3.5 7 10 7a10 10 0 0 0 4.4-1M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
+const COPY='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>';
+const PEN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.8 2.8 0 0 1 4 4L8 20l-5 1 1-5Z"/></svg>';
+const TRASH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M6 6l1 15a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-15"/></svg>';
+
+/* ---------------- state ---------------- */
+let D = { creds: [], audit: [] };   // in-memory only — never written to browser storage
+let view = 'dashboard';
+let filt = { cat: null, client: null, q: '' };
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : 'tmp-' + Date.now() + '-' + Math.random());
+const now = () => new Date().toISOString();
+
+/* ---------------- helpers ---------------- */
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function toast(msg, cls){
+  const t = document.createElement('div');
+  t.className = 'toast ' + (cls||'');
+  t.textContent = msg;
+  document.getElementById('toasts').appendChild(t);
+  setTimeout(()=>t.remove(), 2600);
+}
+function daysUntil(dateStr){
+  if(!dateStr) return null;
+  const s = String(dateStr);
+  const d = s.includes('T') ? new Date(s) : new Date(s + 'T00:00:00');
+  if(isNaN(d)) return null;
+  return Math.ceil((d - new Date())/86400000);
+}
+function renClass(days){ return days==null ? '' : days<14 ? 'red' : days<=60 ? 'amber' : 'green'; }
+function fmtDate(s){ if(!s) return '—'; const str=String(s); const d=str.includes('T') ? new Date(str) : new Date(str+'T00:00:00'); return isNaN(d)?esc(s):d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}); }
+function fmtINR(n){ return (n==null||n==='') ? '—' : '₹' + Number(n).toLocaleString('en-IN'); }
+function label(x){ return (x.client_project||'') + ' / ' + (x.service_provider||x.category); }
+
+async function logAudit(action, item, detail){
+  D.audit.unshift({t:now(), action, item, detail:detail||''});
+  if(D.audit.length > 800) D.audit.length = 800;
+  try{
+    await window.authFetch('/audit', {
+      method:'POST',
+      body: JSON.stringify({action, item, detail: detail||''})
+    });
+  }catch(e){ /* audit logging is best-effort; ignore backend errors here */ }
+}
+
+async function copySecret(text, lbl, credName){
+  try{
+    await navigator.clipboard.writeText(text);
+    toast(lbl + ' copied — clears in 20s', 'ok');
+    setTimeout(async ()=>{ try{ await navigator.clipboard.writeText(''); }catch(_){}} , 20000);
+  }catch(e){ toast('Clipboard blocked by browser', 'err'); return; }
+  await logAudit('copied', credName, lbl.toLowerCase());
+}
+
+/* ---------------- data loading (from backend, after login) ---------------- */
+async function loadCreds(){
+  try{
+    const res = await window.authFetch('/credentials');
+    if(!res.ok) throw new Error('bad status ' + res.status);
+    const data = await res.json();
+    D.creds = Array.isArray(data.credentials) ? data.credentials : [];
+  }catch(e){
+    D.creds = [];
+    toast('Could not reach the credentials API — showing an empty vault', 'err');
+  }
+}
+async function loadAudit(){
+  try{
+    const res = await window.authFetch('/audit');
+    if(!res.ok) throw new Error('bad status ' + res.status);
+    const data = await res.json();
+    D.audit = Array.isArray(data.entries) ? data.entries : [];
+  }catch(e){
+    D.audit = [];
+  }
+}
+
+/* Called by login.js once a login (any role) succeeds. */
+let userRole = null; // 'main' | 'social' | 'developer' | 'secondary'
+
+function isSocialRole(){ return userRole === 'social'; }
+function isDeveloperRole(){ return userRole === 'developer'; }
+
+/**
+ * Social Media accounts only manage social handles — they never see
+ * renewals/FTP/hosting/domains anywhere in the UI (header Add button,
+ * Renewals tab, dashboard quick-links, or the "Upcoming renewals" card).
+ *
+ * Developer accounts see everything EXCEPT Social Media — the Social Media
+ * tab and its dashboard quick-link ("See Social Media") are hidden for them
+ * (backend already blocks the data too, this just keeps the UI in sync).
+ */
+function applyRoleVisibility(){
+  const hideForSocial = isSocialRole();
+  const hideSocialTab = isSocialRole() ? false : isDeveloperRole();
+  const addBtn = document.getElementById('addBtn');
+  const renewalsTab = document.getElementById('tab-renewals');
+  const socialTab = document.getElementById('tab-social');
+  if (addBtn) addBtn.style.display = hideForSocial ? 'none' : '';
+  if (renewalsTab) renewalsTab.style.display = hideForSocial ? 'none' : '';
+  if (socialTab) socialTab.style.display = hideSocialTab ? 'none' : '';
+  // if a social user is somehow sitting on the renewals view when this runs
+  // (e.g. re-login without a full page reload), bounce them to the dashboard
+  if (hideForSocial && view === 'renewals') go('dashboard');
+  // same idea for a developer somehow sitting on the social view
+  if (hideSocialTab && view === 'social') go('dashboard');
+}
+
+window.addEventListener('auctech:login', async (ev) => {
+  const user = ev.detail && ev.detail.user;
+  userRole = user ? user.role : null;
+  document.getElementById('whoami').textContent = user ? (user.email || user.name || '') : '';
+  applyRoleVisibility();
+  toast('Loading your vault…');
+  await Promise.all([loadCreds(), loadAudit()]);
+  // On a normal (fresh) login always start at the dashboard; on a resumed
+  // session after a page refresh, go back to whichever tab was open —
+  // sessionStorage's 'auctech_view' is only ever set by go() below, so a
+  // brand-new login (no prior view saved yet, or an old value from a
+  // different logged-out session) still safely falls back to 'dashboard'.
+  const savedView = sessionStorage.getItem('auctech_view');
+  const savedTab = savedView && document.querySelector(`.tab[data-view="${savedView}"]`);
+  const savedTabVisible = savedTab && savedTab.style.display !== 'none';
+  go(savedTabVisible ? savedView : 'dashboard');
+});
+
+function manualLogout(){
+  if(typeof window.logout === 'function'){
+    window.logout();
+  }else{
+    // Fallback if login.js hasn't exposed a logout() helper yet.
+    document.getElementById('app').classList.remove('on');
+    document.getElementById('lockScreen').style.display = 'flex';
+  }
+  D = { creds: [], audit: [] };
+}
+
+/* ---------------- navigation & search ---------------- */
+function go(v){
+  view = v;
+  sessionStorage.setItem('auctech_view', v);
+  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('on', b.dataset.view===v));
+  render();
+}
+function doSearch(q){
+  filt.q = q;
+  if(view !== 'vault' && q.trim()) go('vault');
+  else if(view==='vault') renderList();
+}
+function render(){
+  const m = document.getElementById('main');
+  if(view==='dashboard') m.innerHTML = rDashboard();
+  else if(view==='vault'){ m.innerHTML = rVault(); renderList(); }
+  else if(view==='renewals') m.innerHTML = rRenewals();
+  else if(view==='social') m.innerHTML = rSocial();
+  else if(view==='settings') m.innerHTML = rSettings();
+}
+function goCat(cat){ filt.cat = cat; filt.client = null; filt.q=''; const s=document.getElementById('globalSearch'); if(s) s.value=''; go('vault'); }
+
+/* ---------------- dashboard ---------------- */
+function rDashboard(){
+  const c = D.creds;
+  const withRen = c.filter(x=>x.renewal_date);
+  const dcount = n => withRen.filter(x=>{const d=daysUntil(x.renewal_date); return d!=null && d>=0 && d<=n;}).length;
+  const overdue = withRen.filter(x=>{const d=daysUntil(x.renewal_date); return d!=null && d<0;}).length;
+  const recent = [...c].sort((a,b)=>(b.last_updated||'').localeCompare(a.last_updated||'')).slice(0,5);
+  const upcoming = withRen.map(x=>({...x,d:daysUntil(x.renewal_date)})).filter(x=>x.d!=null)
+    .sort((a,b)=>a.d-b.d).slice(0,12);
+  const social = isSocialRole();
+  const developer = isDeveloperRole();
+  let h = social
+    ? `<div class="quickrow">
+    <button class="btn" onclick="go('social')">💬 See Social Media</button>
+  </div>`
+    : `<div class="quickrow">
+    <button class="btn" onclick="go('renewals')">📅 See Renewals</button>
+    <button class="btn" onclick="goCat('FTP')">📁 See FTP</button>
+    ${developer ? '' : `<button class="btn" onclick="go('social')">💬 See Social Media</button>`}
+    <button class="btn" onclick="goCat('Hosting / cPanel')">🖥️ See Hosting</button>
+    <button class="btn" onclick="goCat('Domain Registrar')">🌐 See Domains</button>
+  </div>`;
+  h += `<div class="cards">
+    <div class="card stat"><div class="n">${c.length}</div><div class="l">Credentials stored</div></div>
+    <div class="card stat warn"><div class="n">${dcount(30)}</div><div class="l">Renewals in 30 days</div></div>
+    <div class="card stat"><div class="n">${dcount(90)}</div><div class="l">Renewals in 90 days</div></div>
+    <div class="card stat ${overdue?'danger':'ok'}"><div class="n">${overdue}</div><div class="l">Overdue renewals</div></div>
+  </div>`;
+  if(!c.length) return h + `<div class="card empty"><div class="big">🌸</div><p>Your vault is empty. Add your first credential with the ＋ Add button.</p></div>`;
+  if(!social){
+    h += `<h3 class="section-t">Upcoming renewals</h3>`;
+    h += upcoming.length ? `<div class="card timeline">` + upcoming.map(x=>{
+        const cl = renClass(x.d);
+        const dl = x.d<0 ? Math.abs(x.d)+'d overdue' : x.d===0 ? 'Due today' : 'in '+x.d+'d';
+        return `<div class="tl-item tl-${cl}"><div class="d">${dl}</div><div class="dom">${esc(x.url_or_host||x.client_project)}</div><div class="amt">${fmtDate(x.renewal_date)} · ${fmtINR(x.renewal_amount)}</div></div>`;
+      }).join('') + `</div>` : `<div class="card empty"><p>No renewal dates tracked yet.</p></div>`;
+  }
+  h += `<h3 class="section-t">Recently updated</h3><div class="cred-list">` + recent.map(credRow).join('') + `</div>`;
+  return h;
+}
+
+/* ---------------- vault ---------------- */
+function rVault(){
+  const cats = CATEGORIES.filter(cat=>D.creds.some(x=>x.category===cat));
+  const clients = [...new Set(D.creds.map(x=>x.client_project).filter(Boolean))].sort();
+  return `
+    <div class="chiprow">
+      <button class="chip ${!filt.cat?'on':''}" onclick="filt.cat=null;render()">All</button>` +
+      cats.map(cat=>`<button class="chip ${filt.cat===cat?'on':''}" onclick='filt.cat=${JSON.stringify(cat)};render()'>${esc(cat)}</button>`).join('') +
+    `</div>
+    <div class="chiprow">
+      <button class="chip ${!filt.client?'on':''}" onclick="filt.client=null;render()">All clients</button>` +
+      clients.map(cl=>`<button class="chip ${filt.client===cl?'on':''}" onclick='filt.client=${JSON.stringify(cl)};render()'>${esc(cl)}</button>`).join('') +
+    `</div>
+    <div class="count-line" id="countLine"></div>
+    <div class="cred-list" id="credList"></div>`;
+}
+function filteredCreds(){
+  const q = filt.q.trim().toLowerCase();
+  return D.creds.filter(x =>
+    (!filt.cat || x.category===filt.cat) &&
+    (!filt.client || x.client_project===filt.client) &&
+    (!q || [x.client_project,x.service_provider,x.url_or_host,x.username,x.category,x.notes,(x.tags||[]).join(' ')]
+      .join(' ').toLowerCase().includes(q))
+  ).sort((a,b)=>(a.client_project||'').localeCompare(b.client_project||''));
+}
+function renderList(){
+  const el = document.getElementById('credList');
+  if(!el) return;
+  const list = filteredCreds();
+  const cl = document.getElementById('countLine');
+  if(cl) cl.textContent = list.length + ' of ' + D.creds.length + ' credentials' + (filt.q?' · search: “'+filt.q+'”':'');
+  el.innerHTML = list.length ? list.map(credRow).join('')
+    : `<div class="card empty"><p>Nothing matches. Try a different search or clear the filters.</p></div>`;
+}
+function credRow(x){
+  const ic = CAT_ICONS[x.category] || CAT_ICONS['Note'];
+  const maskedUser = x.username ? esc(x.username).replace(/(?<=^.{2}).(?=.{2})/g,'•') : '<span style="color:var(--faint)">no username</span>';
+  const d = daysUntil(x.renewal_date);
+  const ren = x.renewal_date ? `<span class="badge b-${renClass(d)==='green'?'ok':renClass(d)==='amber'?'warn':'danger'}">${d<0?'overdue':'renews '+fmtDate(x.renewal_date)}</span>` : '';
+  return `<div class="card cred" id="cred-${x.id}">
+    <div class="cat-ic">${ic}</div>
+    <div class="info">
+      <div class="t">${esc(x.client_project||'—')} <span class="prov">${esc(x.service_provider||x.category)}</span> ${ren}
+        ${(x.tags||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
+      <div class="s">${maskedUser}${x.url_or_host? ' · '+esc(x.url_or_host):''}</div>
+      <div class="s secret-row" id="sec-${x.id}" style="display:none"></div>
+    </div>
+    <div class="acts">
+      ${x.hasPassword?`<button class="icon-btn" title="Reveal password" onclick="reveal('${x.id}')" id="eye-${x.id}">${EYE}</button>
+      <button class="icon-btn" title="Copy password" onclick="copyPw('${x.id}')">${COPY}</button>`:''}
+      <button class="icon-btn" title="Edit" onclick="openEdit('${x.id}')">${PEN}</button>
+      <button class="icon-btn" title="Delete" onclick="delCred('${x.id}')">${TRASH}</button>
+    </div></div>`;
+}
+async function fetchPassword(id){
+  const res = await window.authFetch('/credentials/' + encodeURIComponent(id) + '/reveal');
+  if(!res.ok) throw new Error('bad status ' + res.status);
+  const data = await res.json();
+  return data.password || '';
+}
+async function reveal(id){
+  const x = D.creds.find(c=>c.id===id); if(!x) return;
+  const row = document.getElementById('sec-'+id), eye = document.getElementById('eye-'+id);
+  if(row.style.display==='none'){
+    try{
+      row.textContent = await fetchPassword(id);
+    }catch(e){ toast('Could not fetch password — backend error', 'err'); return; }
+    row.style.display=''; eye.innerHTML = EYEOFF;
+    setTimeout(()=>{ if(row){row.style.display='none';row.textContent='';} if(eye) eye.innerHTML=EYE; }, 30000);
+  } else { row.style.display='none'; row.textContent=''; eye.innerHTML = EYE; }
+}
+async function copyPw(id){
+  const x=D.creds.find(c=>c.id===id); if(!x) return;
+  try{
+    const pw = await fetchPassword(id);
+    await copySecret(pw,'Password',label(x));
+  }catch(e){ toast('Could not fetch password — backend error', 'err'); }
+}
+async function delCred(id){
+  const x = D.creds.find(c=>c.id===id); if(!x) return;
+  if(!confirm('Delete "'+label(x)+'"? This cannot be undone.')) return;
+  try{
+    const res = await window.authFetch('/credentials/' + encodeURIComponent(id), { method:'DELETE' });
+    if(!res.ok) throw new Error('bad status ' + res.status);
+    D.creds = D.creds.filter(c=>c.id!==id);
+    toast('Deleted','ok'); render();
+  }catch(e){
+    toast('Could not delete — backend error', 'err');
+  }
+}
+
+/* ---------------- add / edit ---------------- */
+function openEdit(id, presetClient, presetCat){
+  const x = id ? D.creds.find(c=>c.id===id) : null;
+  const g = f => x ? esc(x[f]??'') : '';
+  const gDate = f => { if(!x || !x[f]) return ''; const d = new Date(x[f]); return isNaN(d) ? '' : d.toISOString().slice(0,10); };
+  const cat = x ? x.category : (presetCat || 'Domain Registrar');
+  const presetCl = (!x && presetClient) ? esc(presetClient) : '';
+  document.getElementById('drawer').innerHTML = `
+    <h3>${x?'Edit credential':'Add credential'}</h3>
+    <form id="credForm" onsubmit="return saveCred(event, ${x?JSON.stringify(id):'null'})">
+      <div class="row2">
+        <div class="field"><label>Client / Project</label><input name="client_project" value="${g('client_project')||presetCl}" placeholder="e.g. Sibook" required></div>
+        <div class="field"><label>Category</label><select name="category" onchange="catFields(this.value)">${CATEGORIES.map(c=>`<option ${c===cat?'selected':''}>${c}</option>`).join('')}</select></div>
+      </div>
+      <div class="field"><label>Platform / Service provider</label><input name="service_provider" value="${g('service_provider')}" placeholder="${cat==='Social / Business Account'?'e.g. Facebook, Instagram, YouTube, LinkedIn':'e.g. GoDaddy, Hostinger'}"></div>
+      <div class="field"><label>URL / Host / Domain</label><input name="url_or_host" value="${g('url_or_host')}"></div>
+      <div class="field" id="f_port" style="display:none"><label>Port</label><input name="port" value="${g('port')}" placeholder="22 / 3306 / 21"></div>
+      <div class="field"><label>Username</label><input name="username" value="${g('username')}" autocomplete="off"></div>
+      <div class="field"><label>Password / Secret</label>
+        <div class="pw-wrap"><input name="password" id="pwInput" type="password" value="${g('password')}" autocomplete="new-password">
+        <button type="button" class="icon-btn" onclick="const p=document.getElementById('pwInput');p.type=p.type==='password'?'text':'password'">${EYE}</button></div></div>
+      <div id="f_renewal" style="display:none">
+        <div class="row2">
+          <div class="field"><label>Renewal date</label><input type="date" name="renewal_date" value="${gDate('renewal_date')}"></div>
+          <div class="field"><label>Amount (INR / yr)</label><input type="number" step="0.01" name="renewal_amount" value="${g('renewal_amount')}"></div>
+        </div>
+        <div class="field"><label>Renewal status</label><select name="renewal_status">
+          ${['','Confirmed','Estimate-Verify','Expired','Renewed'].map(s=>`<option ${x&&x.renewal_status===s?'selected':''}>${s}</option>`).join('')}</select></div>
+      </div>
+      <div class="field"><label>Tags (comma-separated)</label><input name="tags" value="${x?esc((x.tags||[]).join(', ')):''}"></div>
+      <div class="field"><label>Notes</label><textarea name="notes" rows="3">${g('notes')}</textarea></div>
+      <div class="foot">
+        <button type="button" class="btn" onclick="closeDrawer()">Cancel</button>
+        <button class="btn btn-primary" type="submit">${x?'Save changes':'Add to vault'}</button>
+      </div>
+    </form>`;
+  document.getElementById('overlay').classList.add('on');
+  document.getElementById('drawer').classList.add('on');
+  catFields(cat);
+}
+function catFields(cat){
+  document.getElementById('f_port').style.display = (cat==='VPS / SSH'||cat==='FTP') ? '' : 'none';
+  document.getElementById('f_renewal').style.display = (cat==='Domain Registrar'||cat==='Hosting / cPanel') ? '' : 'none';
+}
+function closeDrawer(){
+  document.getElementById('overlay').classList.remove('on');
+  document.getElementById('drawer').classList.remove('on');
+}
+async function saveCred(e, id){
+  e.preventDefault();
+  const f = new FormData(e.target), v = k => (f.get(k)||'').toString().trim();
+  const rec = {
+    client_project:v('client_project'), category:v('category'), service_provider:v('service_provider'),
+    url_or_host:v('url_or_host'), port:v('port'), username:v('username'), password:v('password'),
+    notes:v('notes'), tags:v('tags')?v('tags').split(',').map(t=>t.trim()).filter(Boolean):[],
+    renewal_date:v('renewal_date')||null, renewal_amount:v('renewal_amount')||null,
+    renewal_status:v('renewal_status')||null, last_updated:now()
+  };
+  try{
+    if(id){
+      const res = await window.authFetch('/credentials/' + encodeURIComponent(id), {
+        method:'PUT', body: JSON.stringify(rec)
+      });
+      if(!res.ok) throw new Error('bad status ' + res.status);
+      const i = D.creds.findIndex(c=>c.id===id);
+      D.creds[i] = {...D.creds[i], ...rec};
+    } else {
+      const res = await window.authFetch('/credentials', {
+        method:'POST', body: JSON.stringify(rec)
+      });
+      if(!res.ok) throw new Error('bad status ' + res.status);
+      const created = await res.json();
+      rec.id = created.id || uid();
+      rec.created = created.created || now();
+      D.creds.push(rec);
+    }
+    closeDrawer(); toast('Saved','ok'); render();
+  }catch(err){
+    toast('Could not save — backend error', 'err');
+  }
+  return false;
+}
+
+/* ---------------- renewals ---------------- */
+function rRenewals(){
+  const rows = D.creds.filter(x=>x.renewal_date).map(x=>({...x,d:daysUntil(x.renewal_date)}))
+    .sort((a,b)=>(a.d??9e9)-(b.d??9e9));
+  if(!rows.length) return `<div class="card empty"><p>No renewal dates yet. Add a Domain Registrar or Hosting credential with a renewal date.</p></div>`;
+  const total = rows.reduce((s,x)=>s+(Number(x.renewal_amount)||0),0);
+  return `<div class="card" style="overflow-x:auto"><table><thead><tr>
+      <th>Domain / Host</th><th>Provider</th><th>Renewal</th><th>Due</th><th>Amount</th><th>Status</th><th></th></tr></thead><tbody>` +
+    rows.map(x=>{
+      const cl = renClass(x.d);
+      const badge = x.renewal_status==='Estimate-Verify' ? `<span class="badge b-warn">Verify date</span>`
+        : x.renewal_status==='Expired' ? `<span class="badge b-danger">Expired</span>`
+        : x.renewal_status==='Renewed' ? `<span class="badge b-ok">Renewed</span>`
+        : x.renewal_status==='Confirmed' ? `<span class="badge b-ok">Confirmed</span>` : `<span class="badge b-mut">—</span>`;
+      return `<tr><td style="font-weight:700">${esc(x.url_or_host||x.client_project)}</td>
+        <td style="color:var(--muted)">${esc(x.service_provider||'—')}</td>
+        <td>${fmtDate(x.renewal_date)}</td>
+        <td><span class="badge b-${cl==='green'?'ok':cl==='amber'?'warn':'danger'}">${x.d<0?Math.abs(x.d)+'d overdue':x.d+'d'}</span></td>
+        <td>${fmtINR(x.renewal_amount)}</td><td>${badge}</td>
+        <td style="text-align:right;white-space:nowrap">
+          ${x.renewal_status==='Estimate-Verify'?`<button class="btn btn-ghost" style="font-size:.75rem;padding:5px 10px" onclick="verifyRen('${x.id}')">Verified ✓</button>`:''}
+          <button class="icon-btn" onclick="openEdit('${x.id}')">${PEN}</button></td></tr>`;
+    }).join('') +
+    `</tbody></table></div>
+    <p style="margin-top:12px;color:var(--muted);font-size:.85rem">Tracked yearly renewal spend: <b style="color:var(--text)">${fmtINR(total)}</b> across ${rows.length} items.</p>`;
+}
+async function verifyRen(id){
+  const x = D.creds.find(c=>c.id===id); if(!x) return;
+  const rec = {...x, renewal_status:'Confirmed', last_updated:now()};
+  try{
+    const res = await window.authFetch('/credentials/' + encodeURIComponent(id), {
+      method:'PUT', body: JSON.stringify(rec)
+    });
+    if(!res.ok) throw new Error('bad status ' + res.status);
+    x.renewal_status = 'Confirmed'; x.last_updated = now();
+    toast('Marked as confirmed','ok'); render();
+  }catch(e){
+    toast('Could not update — backend error', 'err');
+  }
+}
+
+/* ---------------- social media ---------------- */
+function rSocial(){
+  const socials = D.creds.filter(x=>x.category==='Social / Business Account')
+    .sort((a,b)=>(a.service_provider||'').localeCompare(b.service_provider||''));
+  let h = `<div class="quickrow"><button class="btn btn-primary" onclick="openEdit(null, null, 'Social / Business Account')">＋ Add social account</button></div>`;
+  if(!socials.length)
+    return h + `<div class="card empty"><div class="big">💬</div><p>No social media accounts yet. Add one — every handle you save for the same client will automatically group together here.</p></div>`;
+  const byClient = {};
+  socials.forEach(x => { const k = x.client_project || 'Other'; (byClient[k] = byClient[k] || []).push(x); });
+  const clients = Object.keys(byClient).sort();
+  h += clients.map(cl => {
+    const hs = byClient[cl];
+    return `<div class="card soc-card">
+      <div class="soc-head"><h3>${esc(cl)}</h3>
+        <span class="tag">${hs.length} handle${hs.length>1?'s':''}</span>
+        <button class="btn btn-ghost" style="font-size:.78rem;padding:5px 12px" onclick='openEdit(null, ${JSON.stringify(cl).replace(/'/g,"&#39;")}, "Social / Business Account")'>＋ Add handle</button>
+      </div>` + hs.map(handleRow).join('') + `</div>`;
+  }).join('');
+  return h;
+}
+function handleRow(x){
+  const plat = x.service_provider || 'Account';
+  const maskedUser = x.username ? esc(x.username).replace(/(?<=^.{2}).(?=.{2})/g,'•') : '<span style="color:var(--faint)">no username</span>';
+  return `<div class="handle">
+    <span class="plat">${esc(plat)}</span>
+    <span class="u">${maskedUser}${x.url_or_host? ' · '+esc(x.url_or_host):''}
+      <span class="secret-row" id="sec-${x.id}" style="display:none"></span></span>
+    <span class="hacts">
+      ${x.hasPassword?`<button class="icon-btn" title="Reveal password" onclick="reveal('${x.id}')" id="eye-${x.id}">${EYE}</button>
+      <button class="icon-btn" title="Copy password" onclick="copyPw('${x.id}')">${COPY}</button>`:''}
+      <button class="icon-btn" title="Edit" onclick="openEdit('${x.id}')">${PEN}</button>
+      <button class="icon-btn" title="Delete" onclick="delCred('${x.id}')">${TRASH}</button>
+    </span></div>`;
+}
+
+/* ---------------- settings ---------------- */
+// Maps the raw backend action string to a display label + the existing
+// a-* CSS color class (see the "audit / settings" CSS block above) so
+// every entry in Recent activity is colored consistently, regardless of
+// whether it came from an auto-logged server action (view/reveal/created/
+// edited/deleted/login/...) or the one remaining client-side action
+// (copied, which has no server route of its own to log it from).
+const ACTION_META = {
+  view:              { label: 'viewed',      cls: 'a-viewed' },
+  reveal:            { label: 'viewed',      cls: 'a-viewed' },
+  copied:            { label: 'copied',      cls: 'a-copied' },
+  created:           { label: 'added',       cls: 'a-added' },
+  edited:            { label: 'edited',      cls: 'a-edited' },
+  deleted:           { label: 'deleted',     cls: 'a-deleted' },
+  export:            { label: 'exported',    cls: 'a-edited' },
+  restore:           { label: 'restored',    cls: 'a-added' },
+  login:             { label: 'login',       cls: 'a-unlock' },
+  logout:            { label: 'logout',      cls: 'a-unlock' },
+  auto_logout_idle:  { label: 'auto logout', cls: 'a-unlock' },
+};
+function actionMeta(action){ return ACTION_META[action] || { label: action, cls: '' }; }
+
+function rSettings(){
+  return `
+  <div class="card set-block">
+    <h3>Session</h3>
+    <div class="d">You're logged in via your AucTech account. Sessions auto-lock after 5 minutes of inactivity, and secondary (guest) logins are always reported to the vault owner.</div>
+    <button class="btn btn-danger" onclick="manualLogout()">Log out now</button>
+  </div>` +
+  (userRole === 'main' ? `
+  <div class="card set-block">
+    <h3>Encrypted backup</h3>
+    <div class="d">Download the vault as an encrypted file (opens only with your master password), or restore one. Restoring replaces the current vault.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" onclick="downloadEncryptedBackup()">Download encrypted backup</button>
+      <button class="btn" onclick="document.getElementById('restoreFileInput').click()">Restore backup</button>
+      <input type="file" id="restoreFileInput" accept=".auctechbackup,.json" style="display:none" onchange="restoreBackupFile(event)">
+      <button class="btn btn-danger" onclick="exportDecryptedJson()">Export decrypted JSON…</button>
+    </div>
+  </div>` : '') +
+  `<div class="card set-block">
+    <h3>Recent activity</h3>
+    <div class="d">Every reveal, copy, edit and delete is logged on the server.</div>
+    <div style="max-height:320px;overflow-y:auto;border:1px solid var(--line);border-radius:10px">` +
+    (D.audit.length ? D.audit.slice(0,120).map(a=>{
+      const dt = new Date(a.createdAt || a.t);
+      const when = isNaN(dt) ? '—' : `${dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short'})} ${dt.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}`;
+      const meta = actionMeta(a.action);
+      return `<div class="audit-row"><span class="when">${when}</span>
+        <span class="act ${meta.cls}">${esc(meta.label)}</span><span>${esc(a.item||'')}${a.detail?' — '+esc(a.detail):''}</span></div>`;
+    }).join('') : `<div class="empty"><p>No activity yet.</p></div>`) +
+  `</div></div>`;
+}
+
+/* ---------------- encrypted backup (Settings) ----------------
+ * Client-side AES-256-GCM (Web Crypto), keyed by PBKDF2 over a backup
+ * password YOU choose at download time — this is deliberately separate
+ * from your login password, so resetting your login password later never
+ * locks you out of an old backup file. The server only ever sees the
+ * already-decrypted export once (GET /credentials/export/all) or the
+ * already-decrypted restore payload (POST /credentials/restore); the
+ * encrypt/decrypt step itself happens entirely in the browser, so the
+ * backup password never leaves this device.
+ */
+const BACKUP_FILE_MAGIC = 'AUCTECHVAULTBACKUP1';
+
+async function deriveBackupKey(password, saltBytes){
+  const enc = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt: saltBytes, iterations: 210000, hash: 'SHA-256' },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt', 'decrypt']
+  );
+}
+
+function downloadBlob(filename, text){
+  const blob = new Blob([text], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+}
+
+async function fetchFullExport(){
+  const res = await window.authFetch('/credentials/export/all');
+  if(!res.ok) throw new Error('bad status ' + res.status);
+  return res.json(); // { credentials, exportedAt }
+}
+
+// btoa(String.fromCharCode(...bytes)) blows the call stack on large buffers
+// (a vault with a few hundred credentials easily produces a ciphertext of
+// tens of thousands of bytes) — spreading that many arguments into
+// String.fromCharCode throws "Maximum call stack size exceeded" in every
+// browser. Building the binary string in small chunks avoids that limit
+// no matter how big the vault is.
+function bufToB64(buf){
+  const bytes = new Uint8Array(buf);
+  let binary = '';
+  const chunkSize = 0x8000; // 32KB at a time
+  for(let i=0;i<bytes.length;i+=chunkSize){
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i+chunkSize));
+  }
+  return btoa(binary);
+}
+
+async function downloadEncryptedBackup(){
+  const password = prompt('Set a master password for this backup file.\nYou will need this exact password to restore it — it does NOT have to match your login password.');
+  if(!password) return;
+  if(password.length < 8) return toast('Backup password must be at least 8 characters', 'err');
+  const confirmPw = prompt('Confirm the backup password:');
+  if(confirmPw !== password) return toast('Passwords did not match — try again', 'err');
+
+  try{
+    toast('Preparing backup…');
+    const data = await fetchFullExport();
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const key = await deriveBackupKey(password, salt);
+    const enc = new TextEncoder();
+    const cipherBuf = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(JSON.stringify(data)));
+    const file = {
+      magic: BACKUP_FILE_MAGIC,
+      salt: bufToB64(salt),
+      iv: bufToB64(iv),
+      ciphertext: bufToB64(cipherBuf),
+      createdAt: new Date().toISOString(),
+    };
+    downloadBlob(`auctech-vault-backup-${new Date().toISOString().slice(0,10)}.auctechbackup`, JSON.stringify(file));
+    toast('Encrypted backup downloaded', 'ok');
+  }catch(e){
+    console.error('[Backup] download failed:', e);
+    toast('Could not create backup: ' + (e && e.message ? e.message : 'unknown error'), 'err');
+  }
+}
+
+async function restoreBackupFile(ev){
+  const file = ev.target.files && ev.target.files[0];
+  ev.target.value = ''; // reset so picking the same file again still fires onchange
+  if(!file) return;
+
+  try{
+    const raw = JSON.parse(await file.text());
+    if(raw.magic !== BACKUP_FILE_MAGIC) return toast('Not a valid AucTech Vault backup file', 'err');
+
+    const password = prompt('Enter the master password for this backup file:');
+    if(!password) return;
+
+    const fromB64 = (s) => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+    const salt = fromB64(raw.salt), iv = fromB64(raw.iv), ciphertext = fromB64(raw.ciphertext);
+    const key = await deriveBackupKey(password, salt);
+
+    let plainBuf;
+    try{
+      plainBuf = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ciphertext);
+    }catch(e){
+      return toast('Wrong password, or the file is corrupted', 'err');
+    }
+    const data = JSON.parse(new TextDecoder().decode(plainBuf));
+    const items = Array.isArray(data.credentials) ? data.credentials : [];
+
+    if(!confirm(`Restore this backup? This REPLACES your current vault with ${items.length} credential(s) from the backup. This cannot be undone.`)) return;
+
+    toast('Restoring…');
+    const res = await window.authFetch('/credentials/restore', {
+      method: 'POST',
+      body: JSON.stringify({ credentials: items }),
+    });
+    if(!res.ok) throw new Error('bad status ' + res.status);
+    await Promise.all([loadCreds(), loadAudit()]);
+    render();
+    toast('Vault restored from backup', 'ok');
+  }catch(e){
+    console.error('[Backup] restore failed:', e);
+    toast('Could not restore backup: ' + (e && e.message ? e.message : 'unknown error'), 'err');
+  }
+}
+
+async function exportDecryptedJson(){
+  if(!confirm('This downloads every saved password in PLAIN TEXT, unencrypted. Anyone with this file can read them. Continue?')) return;
+  try{
+    toast('Preparing export…');
+    const data = await fetchFullExport();
+    downloadBlob(`auctech-vault-export-${new Date().toISOString().slice(0,10)}.json`, JSON.stringify(data, null, 2));
+    toast('Decrypted JSON exported', 'ok');
+  }catch(e){
+    console.error('[Backup] export failed:', e);
+    toast('Could not export: ' + (e && e.message ? e.message : 'unknown error'), 'err');
+  }
+}
+
+/* ---------------- keyboard ---------------- */
+document.addEventListener('keydown', e=>{
+  if((e.metaKey||e.ctrlKey) && e.key.toLowerCase()==='k'){
+    e.preventDefault();
+    if(!document.getElementById('app').classList.contains('on')) return;
+    const s = document.getElementById('globalSearch'); if(s) s.focus();
+  }
+  if(e.key==='Escape') closeDrawer();
+});
+</script>
+</body>
+</html>
