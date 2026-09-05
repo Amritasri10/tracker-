@@ -1,0 +1,116 @@
+<div id="lockScreen">
+  <div class="card lock-card" style="max-width:460px">
+    <h1>AucTech Vault</h1>
+    <div class="sub">Choose how you're signing in</div>
+
+    <div class="login-tabs" style="display:flex;gap:6px;justify-content:center;margin-bottom:20px;flex-wrap:wrap">
+      <button class="btn login-tab on" data-tile="main" onclick="showLoginTile('main')">Main</button>
+      <button class="btn login-tab" data-tile="social" onclick="showLoginTile('social')">Social Media</button>
+      <button class="btn login-tab" data-tile="developer" onclick="showLoginTile('developer')">Developer</button>
+      <button class="btn login-tab" data-tile="secondary" onclick="showLoginTile('secondary')">Secondary</button>
+    </div>
+
+    <!-- MAIN -->
+    <div class="login-tile" id="tile-main">
+      <div class="field"><label>Email</label><input id="main-email" type="email" autocomplete="username"></div>
+      <div class="field">
+        <label>Password</label>
+        <div class="pw-wrap">
+          <input id="main-password" type="password" autocomplete="current-password">
+          <button type="button" class="icon-btn pw-toggle" title="Show password" data-target="main-password"></button>
+        </div>
+      </div>
+      <div style="text-align:right;margin:-6px 0 14px">
+        <button type="button" class="link-btn" onclick="openForgotPassword('main')">Forgot password?</button>
+      </div>
+      <button class="btn btn-primary" onclick="passwordLogin('main')" style="width:100%;justify-content:center">Sign in — Full access</button>
+    </div>
+
+    <!-- SOCIAL MEDIA -->
+    <div class="login-tile" id="tile-social" style="display:none">
+      <div class="field"><label>Email</label><input id="social-email" type="email" autocomplete="username"></div>
+      <div class="field">
+        <label>Password</label>
+        <div class="pw-wrap">
+          <input id="social-password" type="password" autocomplete="current-password">
+          <button type="button" class="icon-btn pw-toggle" title="Show password" data-target="social-password"></button>
+        </div>
+      </div>
+      <div style="text-align:right;margin:-6px 0 14px">
+        <button type="button" class="link-btn" onclick="openForgotPassword('social')">Forgot password?</button>
+      </div>
+      <button class="btn btn-primary" onclick="passwordLogin('social')" style="width:100%;justify-content:center">Sign in — Social media access</button>
+    </div>
+
+    <!-- DEVELOPER -->
+    <div class="login-tile" id="tile-developer" style="display:none">
+      <div class="field"><label>Email</label><input id="developer-email" type="email" autocomplete="username"></div>
+      <div class="field">
+        <label>Password</label>
+        <div class="pw-wrap">
+          <input id="developer-password" type="password" autocomplete="current-password">
+          <button type="button" class="icon-btn pw-toggle" title="Show password" data-target="developer-password"></button>
+        </div>
+      </div>
+      <div style="text-align:right;margin:-6px 0 14px">
+        <button type="button" class="link-btn" onclick="openForgotPassword('developer')">Forgot password?</button>
+      </div>
+      <button class="btn btn-primary" onclick="passwordLogin('developer')" style="width:100%;justify-content:center">Sign in — Developer access</button>
+    </div>
+
+    <!-- FORGOT PASSWORD -->
+    <div class="login-tile" id="tile-forgot" style="display:none">
+      <div class="sub" id="forgot-heading" style="margin-bottom:14px">Reset your password</div>
+
+      <div id="forgot-step-1">
+        <div class="field"><label>Email</label><input id="forgot-email" type="email" autocomplete="username"></div>
+        <button class="btn btn-primary" onclick="requestPasswordReset()" style="width:100%;justify-content:center">Send reset code</button>
+        <button class="btn btn-ghost" onclick="closeForgotPassword()" style="width:100%;justify-content:center;margin-top:8px">Back to sign in</button>
+      </div>
+
+      <div id="forgot-step-2" style="display:none">
+        <div class="field"><label>Reset code</label><input id="forgot-otp" inputmode="numeric" maxlength="6"></div>
+        <div class="field">
+          <label>New password</label>
+          <div class="pw-wrap">
+            <input id="forgot-new-password" type="password" autocomplete="new-password">
+            <button type="button" class="icon-btn pw-toggle" title="Show password" data-target="forgot-new-password"></button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Confirm new password</label>
+          <div class="pw-wrap">
+            <input id="forgot-confirm-password" type="password" autocomplete="new-password">
+            <button type="button" class="icon-btn pw-toggle" title="Show password" data-target="forgot-confirm-password"></button>
+          </div>
+        </div>
+        <div class="sub" style="margin-bottom:14px">Code sent to your email — check your inbox (and spam folder). It expires in a few minutes.</div>
+        <button class="btn btn-primary" onclick="submitPasswordReset()" style="width:100%;justify-content:center">Reset password</button>
+        <button class="btn btn-ghost" onclick="resendPasswordReset()" style="width:100%;justify-content:center;margin-top:8px">Resend code</button>
+        <button class="btn btn-ghost" onclick="closeForgotPassword()" style="width:100%;justify-content:center;margin-top:8px">Back to sign in</button>
+      </div>
+    </div>
+
+    <!-- SECONDARY -->
+    <div class="login-tile" id="tile-secondary" style="display:none">
+      <div id="sec-step-1">
+        <div class="field"><label>Full name</label><input id="sec-name" type="text"></div>
+        <div class="field"><label>Email</label><input id="sec-email" type="email"></div>
+        <div class="sub" style="margin-bottom:14px">
+          Allow location access — it's required to continue.
+        </div>
+        <button class="btn btn-primary" onclick="secondaryStep1()" style="width:100%;justify-content:center">Continue</button>
+      </div>
+
+      <div id="sec-step-2" style="display:none">
+        <div class="field"><label>Enter OTP</label><input id="sec-otp" inputmode="numeric" maxlength="6"></div>
+        <div class="sub" style="margin-bottom:14px">Sent to your email — check your inbox.</div>
+        <button class="btn btn-primary" onclick="secondaryVerifyOtp()" style="width:100%;justify-content:center">Verify &amp; Sign in</button>
+        <button class="btn btn-ghost" onclick="secondaryResendOtp()" style="width:100%;justify-content:center;margin-top:8px">Resend OTP</button>
+      </div>
+    </div>
+
+    <div class="lock-err" id="loginErr"></div>
+    <div class="lock-foot">All secondary-user logins and activity are reported to the vault owner.</div>
+  </div>
+</div>

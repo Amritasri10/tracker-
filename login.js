@@ -1,33 +1,3 @@
-/**
- * AucTech Vault — multi-role login module (frontend).
- *
- * Drop this file in next to your HTML and replace the old #lockScreen block
- * with the markup in login.html (same folder). It talks to the backend in
- * this project over the endpoints below. Set API_BASE to your deployed API URL.
- *
- * Flows implemented:
- *  - Main login          -> POST /api/auth/login          {email,password,loginType:'main'}
- *  - Social Media login  -> POST /api/auth/login          {email,password,loginType:'social'}
- *  - Developer login     -> POST /api/auth/login          {email,password,loginType:'developer'}
- *  - Secondary login     -> multi-step wizard:
- *       1. name + email, then mandatory browser geolocation
- *          -> POST /api/auth/secondary/check-email (validate email first)
- *          -> POST /api/auth/secondary/init (name+email+location; emails the OTP)
- *       2. OTP                                     -> POST /api/auth/secondary/verify-otp (logs in)
- *
- * After login, the JWT is kept in sessionStorage (not localStorage) -- it
- * survives a page refresh so the app doesn't bounce you back to the login
- * screen every time you reload, but it's still cleared automatically the
- * moment the browser tab is closed, unlike localStorage which would
- * persist indefinitely on disk. Every fetch to the API goes through
- * `authFetch()`, which attaches the token and auto-logs-out on a 440
- * (IDLE_TIMEOUT) response from the server.
- *
- * A client-side idle timer ALSO logs the user out after 5 minutes of no
- * mouse/keyboard/touch activity, so the UI reacts immediately rather than
- * waiting for the next API call to bounce.
- */
-
 const API_BASE = window.AUCTECH_API_BASE || 'https://auctech-vault-backend-1.onrender.com/api';
 const IDLE_MINUTES = 5;
 const SESSION_TOKEN_KEY = 'auctech_token';
@@ -129,11 +99,7 @@ function initPasswordToggles() {
   });
 }
 window.initPasswordToggles = initPasswordToggles;
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initPasswordToggles);
-} else {
-  initPasswordToggles();
-}
+// Toggles are wired after lockscreen HTML is injected (see index.html fetch callback)
 
 /* ---------------- forgot password ---------------- */
 const forgotPw = { loginType: null };
@@ -405,11 +371,7 @@ async function tryResumeSession() {
     setAuthToken(null);
   }
 }
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', tryResumeSession);
-} else {
-  tryResumeSession();
-}
+// tryResumeSession is called after lockscreen HTML is injected (see index.html fetch callback)
 
 function currentAuthUser() {
   return currentUser;
