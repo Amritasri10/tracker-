@@ -37,26 +37,64 @@ const TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 /* ------------------------------------------------------------------ */
 
 function rVault() {
-  const cats    = CATEGORIES.filter(cat => D.creds.some(x => x.category === cat));
-  const clients = [...new Set(D.creds.map(x => x.client_project).filter(Boolean))].sort();
+  // Build category options from D.categories (API) — fallback to CATEGORIES static list
+  const catList = (D.categories && D.categories.length)
+    ? D.categories.map(c => c.categoryName || c.name).filter(Boolean)
+    : CATEGORIES;
+
+  // Build client options from D.clients (API)
+  const clientList = (D.clients && D.clients.length)
+    ? D.clients.map(c => ({ id: c.id, name: c.name }))
+    : [];
+
+  const catOptions = `<option value="">Select Category</option>` +
+    catList.map(c => `<option value="${esc(c)}" ${filt.cat === c ? 'selected' : ''}>${esc(c)}</option>`).join('');
+
+  const clientOptions = `<option value="">Select Client</option>` +
+    clientList.map(c => `<option value="${esc(c.name)}" ${filt.client === c.name ? 'selected' : ''}>${esc(c.name)}</option>`).join('');
+
   return `
-    <div class="chiprow">
-      <button class="chip ${!filt.cat ? 'on' : ''}" onclick="filt.cat=null;render()">All</button>` +
-      cats.map(cat => `<button class="chip ${filt.cat === cat ? 'on' : ''}" onclick='filt.cat=${JSON.stringify(cat)};render()'>${esc(cat)}</button>`).join('') +
-    `</div>
-    <div class="chiprow">
-      <button class="chip ${!filt.client ? 'on' : ''}" onclick="filt.client=null;render()">All clients</button>` +
-      clients.map(cl => `<button class="chip ${filt.client === cl ? 'on' : ''}" onclick='filt.client=${JSON.stringify(cl)};render()'>${esc(cl)}</button>`).join('') +
-    `</div>
+    <div class="vault-filter-bar">
+      <div class="vault-filter-group">
+        <select id="vaultCatSelect" onchange="">
+          ${catOptions}
+        </select>
+        <select id="vaultClientSelect" onchange="">
+          ${clientOptions}
+        </select>
+        <button class="btn btn-primary" onclick="applyVaultFilter()" style="white-space:nowrap">Show</button>
+        <button class="btn btn-ghost"   onclick="resetVaultFilter()" style="white-space:nowrap">Reset</button>
+      </div>
+    </div>
     <div class="count-line" id="countLine"></div>
-    <div class="cred-list" id="credList"></div>`;
+    <div class="cred-list"  id="credList"></div>`;
+}
+
+function applyVaultFilter() {
+  filt.cat    = document.getElementById('vaultCatSelect').value    || null;
+  filt.client = document.getElementById('vaultClientSelect').value || null;
+  renderList();
+}
+
+function resetVaultFilter() {
+  filt.cat    = null;
+  filt.client = null;
+  filt.q      = '';
+  const gs = document.getElementById('globalSearch');
+  if (gs) gs.value = '';
+  // reset selects visually
+  const cs = document.getElementById('vaultCatSelect');
+  const cl = document.getElementById('vaultClientSelect');
+  if (cs) cs.value = '';
+  if (cl) cl.value = '';
+  renderList();
 }
 
 function filteredCreds() {
   const q = filt.q.trim().toLowerCase();
   return D.creds.filter(x =>
     (!filt.cat    || x.category       === filt.cat)    &&
-    (!filt.client || x.client_project === filt.client) &&
+    (!filt.client || (x.client_project || '').toLowerCase() === filt.client.toLowerCase()) &&
     (!q || [x.client_project, x.service_provider, x.url_or_host, x.username, x.category, x.notes, (x.tags || []).join(' ')]
       .join(' ').toLowerCase().includes(q))
   ).sort((a, b) => (a.client_project || '').localeCompare(b.client_project || ''));

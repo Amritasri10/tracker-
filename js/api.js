@@ -20,4 +20,12 @@ const API_ENDPOINTS = {
 
   // Audit
   AUDIT:                  '/audit',
+
+  // Categories
+  CATEGORIES:             '/categories?isPagination=false',
+  CATEGORY_BY_ID:         (id) => `/categories/${encodeURIComponent(id)}`,
+
+  // Clients
+  CLIENTS:                '/clients?isPagination=false',
+  CLIENT_BY_ID:           (id) => `/clients/${encodeURIComponent(id)}`,
 };

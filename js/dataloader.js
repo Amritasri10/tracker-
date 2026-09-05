@@ -1,7 +1,8 @@
 /**
  * AucTech Vault — Data loading.
  * Depends on: shared state (D), helpers (toast),
- * API functions (apiFetchCredentials, apiFetchAudit).
+ * API functions (apiFetchCredentials, apiFetchAudit, apiFetchCategories,
+ * apiFetchClients).
  */
 
 async function loadCreds() {
@@ -19,4 +20,11 @@ async function loadAudit() {
     const data = await apiFetchAudit();
     D.audit = Array.isArray(data.entries) ? data.entries : [];
   } catch (e) { D.audit = []; }
+}
+
+async function loadClients() {
+  try {
+    const data = await apiFetchClients();
+    D.clients = Array.isArray(data.clients) ? data.clients : [];
+  } catch (e) { D.clients = []; }
 }

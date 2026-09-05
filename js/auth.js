@@ -12,7 +12,7 @@ window.addEventListener('auctech:login', async (ev) => {
   document.getElementById('whoami').textContent = user ? (user.email || user.name || '') : '';
   applyRoleVisibility();
   toast('Loading your vault…');
-  await Promise.all([loadCreds(), loadAudit()]);
+  await Promise.all([loadCreds(), loadAudit(), loadCategories(), loadClients()]);
   const savedView       = sessionStorage.getItem('auctech_view');
   const savedTab        = savedView && document.querySelector(`.tab[data-view="${savedView}"]`);
   const savedTabVisible = savedTab && savedTab.style.display !== 'none';
@@ -27,5 +27,5 @@ function manualLogout() {
     document.getElementById('app').classList.remove('on');
     document.getElementById('lockScreen').style.display = 'flex';
   }
-  D = { creds: [], audit: [] };
+  D = { creds: [], audit: [], categories: [], clients: [] };
 }

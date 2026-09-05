@@ -79,3 +79,75 @@ async function apiLogAudit(action, item, detail) {
   });
   return res; // best-effort — caller ignores errors
 }
+
+/* ------------------------------------------------------------------ */
+/*  Categories                                                          */
+/* ------------------------------------------------------------------ */
+
+async function apiFetchCategories() {
+  const res = await window.authFetch(API_ENDPOINTS.CATEGORIES);
+  if (!res.ok) throw new Error('bad status ' + res.status);
+  return res.json(); // { categories: [{id, categoryName, status}, ...] }
+}
+
+async function apiCreateCategory(rec) {
+  const res = await window.authFetch(API_ENDPOINTS.CATEGORIES, {
+    method: 'POST',
+    body: JSON.stringify(rec),
+  });
+  if (!res.ok) throw new Error('bad status ' + res.status);
+  return res.json();
+}
+
+async function apiUpdateCategory(id, rec) {
+  const res = await window.authFetch(API_ENDPOINTS.CATEGORY_BY_ID(id), {
+    method: 'PUT',
+    body: JSON.stringify(rec),
+  });
+  if (!res.ok) throw new Error('bad status ' + res.status);
+  return res.json();
+}
+
+async function apiDeleteCategory(id) {
+  const res = await window.authFetch(API_ENDPOINTS.CATEGORY_BY_ID(id), {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error('bad status ' + res.status);
+  return res.json();
+}
+
+/* ------------------------------------------------------------------ */
+/*  Clients                                                             */
+/* ------------------------------------------------------------------ */
+
+async function apiFetchClients() {
+  const res = await window.authFetch(API_ENDPOINTS.CLIENTS);
+  if (!res.ok) throw new Error('bad status ' + res.status);
+  return res.json(); // { clients: [{id, name, mobile, email, status}, ...] }
+}
+
+async function apiCreateClient(rec) {
+  const res = await window.authFetch(API_ENDPOINTS.CLIENTS, {
+    method: 'POST',
+    body: JSON.stringify(rec),
+  });
+  if (!res.ok) throw new Error('bad status ' + res.status);
+  return res.json();
+}
+
+async function apiUpdateClient(id, rec) {
+  const res = await window.authFetch(API_ENDPOINTS.CLIENT_BY_ID(id), {
+    method: 'PUT',
+    body: JSON.stringify(rec),
+  });
+  if (!res.ok) throw new Error('bad status ' + res.status);
+  return res.json();
+}
+
+async function apiDeleteClient(id) {
+  const res = await window.authFetch(API_ENDPOINTS.CLIENT_BY_ID(id), {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error('bad status ' + res.status);
+  return res.json();
+}
